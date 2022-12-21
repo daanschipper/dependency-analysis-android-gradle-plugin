@@ -3,6 +3,7 @@ package com.autonomousapps.transform
 import com.autonomousapps.internal.utils.intoSet
 import com.autonomousapps.model.Advice
 import com.autonomousapps.model.ModuleCoordinates
+import com.autonomousapps.model.ProjectCoordinates
 import com.autonomousapps.model.declaration.Bucket
 import com.autonomousapps.model.declaration.Declaration
 import com.autonomousapps.model.declaration.SourceSetKind
@@ -140,6 +141,20 @@ internal class StandardTransformTest {
       val declarations = Declaration(
         identifier = coordinates.identifier,
         configurationName = "compileOnly"
+      ).intoSet()
+
+      val actual = StandardTransform(coordinates, declarations, supportedSourceSets).reduce(usages)
+
+      assertThat(actual).isEmpty()
+    }
+
+    @Test fun `no advice for correct capability declaration`() {
+      val coordinates = ProjectCoordinates(":foo")
+      val usages = usage(Bucket.IMPL, "main").intoSet()
+      val declarations = Declaration(
+        identifier = coordinates.identifier,
+        configurationName = "implementation",
+        doesNotPointAtMainVariant = true
       ).intoSet()
 
       val actual = StandardTransform(coordinates, declarations, supportedSourceSets).reduce(usages)
